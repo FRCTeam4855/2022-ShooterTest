@@ -10,10 +10,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkMaxRelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+
+import static edu.wpi.first.wpilibj.DoubleSolenoid.Value.*;
+
 
 public class Robot extends TimedRobot {
 
@@ -23,9 +29,12 @@ public class Robot extends TimedRobot {
   private CANSparkMax m_motor;
   private Spark n_motor;
   private double deadZone = .02; 
+  DoubleSolenoid exampleDouble = new DoubleSolenoid(1, PneumaticsModuleType.REVPH, 0, 1);
+  Compressor phCompressor = new Compressor(1, PneumaticsModuleType.REVPH);
+  boolean compenabled = phCompressor.enabled();
+  boolean pressureSwitch = phCompressor.getPressureSwitchValue();
 
   
-
   @Override
   public void robotInit() {
     SmartDashboard.putNumber("Spark Max Limit 0-1", .0);
@@ -38,14 +47,25 @@ public class Robot extends TimedRobot {
 
     controller = new Joystick(0); //Left Joystick fore/aft
 
+    phCompressor.enableDigital();
 
-  }
+}
 
   @Override
   public void robotPeriodic() {
     SmartDashboard.putNumber("Spark_Max Current Speed", m_motor.get());
     SmartDashboard.putNumber("Spark Current Speed", n_motor.get());
-    
+
+
+      if (controller.getRawButtonPressed(3)) { 
+      exampleDouble.set(kForward);
+    }
+      if (controller.getRawButtonPressed(4)) { 
+      exampleDouble.set(kReverse);
+    }
+    SmartDashboard.putBoolean("Compressor on?", compenabled);
+    SmartDashboard.putBoolean("Compressor switch?",  pressureSwitch);
+
     //SmartDashboard.setDefaultNumber("Motor M Speed", leftSpeedLimit);
     //leftSpeedLimit = SmartDashboard.getDefaultNumber("Motor M", leftSpeedLimit);
     //playType = SmartDashboard.getString("Match Mode", "MATCH");
